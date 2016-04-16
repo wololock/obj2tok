@@ -1,0 +1,31 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+plugins {
+    id 'net.researchgate.release' version '2.3.4'
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'groovy'
+
+group = 'com.github.wololock'
+sourceCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.3'
+    compile 'org.slf4j:slf4j-api:1.7.21'
+
+    testCompile 'org.codehaus.groovy:groovy-all:2.4.1:indy'
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile 'org.spockframework:spock-spring:1.0-groovy-2.4'
+    testCompile 'org.springframework:spring-test:4.1.4.RELEASE'
+    testCompile 'org.slf4j:slf4j-log4j12:1.7.21'
+}
