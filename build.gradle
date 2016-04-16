@@ -2,20 +2,17 @@ buildscript {
     repositories {
         jcenter()
     }
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
-    }
 }
 
 plugins {
     id 'net.researchgate.release' version '2.3.4'
+    id "com.jfrog.bintray" version "1.6"
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
 
 repositories {
     jcenter()
@@ -43,6 +40,18 @@ publishing {
 
 bintray {
     user = System.getenv('bintray_username')
-    key = System.getenv('bitray_password')
+    key = System.getenv('bintray_password')
     publications = ['MyPublication']
+    publish = true
+    pkg {
+        repo = 'maven'
+        name = 'obj2tok'
+        desc = 'Java object to token converter.'
+        websiteUrl = 'https://github.com/wololock/obj2tok'
+        issueTrackerUrl = 'https://github.com/wololock/obj2tok/issues'
+        vcsUrl = 'https://github.com/wololock/obj2tok.git'
+        licenses = ['Apache-2.0']
+        labels = ['java', 'object', 'token', 'serializer', 'string']
+        publicDownloadNumbers = true
+    }
 }
