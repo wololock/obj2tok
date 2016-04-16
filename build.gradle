@@ -11,6 +11,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'groovy'
+apply plugin: 'maven-publish'
 
 group = 'com.github.wololock'
 sourceCompatibility = 1.8
@@ -28,4 +29,12 @@ dependencies {
     testCompile 'org.spockframework:spock-spring:1.0-groovy-2.4'
     testCompile 'org.springframework:spring-test:4.1.4.RELEASE'
     testCompile 'org.slf4j:slf4j-log4j12:1.7.21'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
 }
