@@ -1,6 +1,7 @@
 = obj2tok - tokenize any object you want
 
-image:https://api.travis-ci.org/wololock/obj2tok.png[Build Status,link=https://travis-ci.org/wololock/obj2tok] image:https://coveralls.io/repos/github/wololock/obj2tok/badge.png?branch=master[Coverage Status,link=https://coveralls.io/github/wololock/obj2tok?branch=master]
+image:https://api.travis-ci.org/wololock/obj2tok.png[Build Status,link=https://travis-ci.org/wololock/obj2tok] image:https://coveralls.io/repos/github/wololock/obj2tok/badge.png?branch=master[Coverage Status,link=https://coveralls.io/github/wololock/obj2tok?branch=master] image:https://api.bintray.com/packages/wololock/maven/obj2tok/images/download.svg[Download,link=https://bintray.com/wololock/maven/obj2tok/_latestVersion]
+
 
 This small (5,5 KB) library allows you to convert Java object to a String token.
 
