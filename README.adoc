@@ -1,0 +1,103 @@
+= obj2tok - tokenize any object you want
+
+image:https://api.travis-ci.org/wololock/obj2tok.png[Build Status,link=https://travis-ci.org/wololock/obj2tok] image:https://coveralls.io/repos/github/wololock/obj2tok/badge.png?branch=master[Coverage Status,link=https://coveralls.io/github/wololock/obj2tok?branch=master]
+
+This small (5,5 KB) library allows you to convert Java object to a String token.
+
+== Requirements
+
+* Java 1.8 (tested with OpenJDK and OracleJDK)
+* Java Cryptography Extension (JCE) http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html[http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html]
+
+== How it works?
+
+*obj2tok* does 3 major things to convert object to a string token:
+
+* It "stringifies" object in the first place (this operation has to be bidirectional)
+* It encodes given string (default implementation provides static key AES cipher token coder)
+* In the end it encodes encrypted bytes using Base64
+
+The main purpose of this class is to provide a simple and straightforward API for tokenizing objects. The tokenizing algorithm supports symmetric encryption using secret key - only authority that creates a token is able to revert tokenization and get the object back.
+
+== Example
+
+Please take a look at this exemplary test case - https://github.com/wololock/obj2tok/blob/master/src/test/groovy/com/github/wololock/obj2tok/examples/TokenWithExpirationExampleSpec.groovy[https://github.com/wololock/obj2tok/blob/master/src/test/groovy/com/github/wololock/obj2tok/examples/TokenWithExpirationExampleSpec.groovy]
+
+What it shows is an example of string tokenizing a class called `Token`:
+
+[source,groovy]
+----
+class Token {
+    String id
+    LocalDateTime createdDate
+    int ttl
+    boolean expired(LocalDateTime now) {
+        return now.isAfter(createdDate.plusHours(ttl))
+    }
+}
+----
+
+The purpose of this class is very simple - it describes a token that expires after a predefined amount of hours (`ttl` field). It contains `id` so the authority that creates the token knows what is the resource id it refers to.
+
+The main class that does tokenization calls `Tokenizer`. It expects 2 dependencies injected by its constructor:
+
+* A `TokenCoder` instance
+* A `Stringifier` instance
+
+As a `TokenCoder` we use `StaticKeyAESCipherTokenCoder` implementation which uses `AES` algorithm with static secret key. As a `Stringifier` we use `JacksonJSONStringifier` implementation that represents object as a JSON string. Keep in mind that these implementations are only exemplary - you can always implement these interfaces on your own and provide a different encoding and stringifying strategies.
+
+Here is what our `TokenCoder` looks like in given example:
+
+[source,groovy]
+----
+TokenCoder tokenCoder = new StaticKeyAESCipherTokenCoder("this_is_secret_key")
+----
+
+`Stringifier` uses predefined `ObjectMapper` that uses serializer and deserializer for `LocalDateTime` class:
+
+[source,groovy]
+----
+Stringifier stringifier = new JacksonJSONStringifier(objectMapper)
+----
+
+Now, if our exemplary object stringifies to:
+
+[source,json]
+----
+{"id":"72a12319-5d81-438f-bb0d-9ae0e430bfb2","createdDate":"2016-04-06T15:45:23","ttl":48}
+----
+
+then this is what its token representation looks like:
+
+[source,text]
+----
+Nl9A3oBR/dyqXJLYweopbpqEwV9D/2kz5VTuxOhxLshC/muB3enTEVTCf/7pOFWWSQVgUs3JlCTm1lqou+UDqg7uaWUdhwUWl71nlgJ21PoaWBYVtLDniCpvfOlqC5OO
+----
+
+As a homework you can grab the token and pass it to the `Tokenizer.fromToken(token,type)` method that uses `TokenCoder` and `Stringifier` mentioned before and you will get back your Java object.
+
+[source,groovy]
+----
+String tokenStr = "Nl9A3oBR/dyqXJLYweopbpqEwV9D/2kz5VTuxOhxLshC/muB3enTEVTCf/7pOFWWSQVgUs3JlCTm1lqou+UDqg7uaWUdhwUWl71nlgJ21PoaWBYVtLDniCpvfOlqC5OO";
+
+Token token = tokenizer.fromToken(tokenStr, Token.class);
+
+assert token.getId().equals("72a12319-5d81-438f-bb0d-9ae0e430bfb2");
+
+assert token.getTtl() == 48;
+
+assert token.getCreatedDate().equals(LocalDateTime.parse("2016-04-06T15:45:23"));
+
+----
+
+
+== Runtime dependencies
+
+[source]
+----
+runtime - Runtime classpath for source set 'main'.
++--- com.fasterxml.jackson.core:jackson-databind:2.7.3
+|    +--- com.fasterxml.jackson.core:jackson-annotations:2.7.0
+|    \--- com.fasterxml.jackson.core:jackson-core:2.7.3
+\--- org.slf4j:slf4j-api:1.7.21
+----
