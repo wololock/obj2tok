@@ -5,6 +5,8 @@ buildscript {
 }
 
 plugins {
+    id 'jacoco'
+    id 'com.github.kt3k.coveralls' version '2.6.3'
     id 'net.researchgate.release' version '2.3.4'
     id "com.jfrog.bintray" version "1.6"
 }
@@ -53,5 +55,12 @@ bintray {
         licenses = ['Apache-2.0']
         labels = ['java', 'object', 'token', 'serializer', 'string']
         publicDownloadNumbers = true
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
     }
 }
